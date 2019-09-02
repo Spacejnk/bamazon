@@ -72,7 +72,7 @@ var db = mysql.createConnection({
 
     ])
     .then(function(user) {
-        // If the inquirerResponse confirms, we displays the inquirerResponse's username and pokemon from the answers.
+        
         if (user.choices === 'pants') {
           console.log("It's available ");
           
