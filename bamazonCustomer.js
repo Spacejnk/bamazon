@@ -2,6 +2,7 @@
 //var express = require('express');
 var mysql = require('mysql');
 var inquirer = require('inquirer');
+var Table = require('cli-table2');
 
 //var app = express();
 
@@ -15,50 +16,69 @@ var db = mysql.createConnection({
 
     user: 'root',
 
-    // password: '',
+    password: '',
 
-    // database: 'bamazon_db'
+    database: 'bamazon_db'
 });
 
-// db.connect(function(err){
-//     if (err) throw err;
-//     console.log('bamazon_db is connected' + db.threadId);
-//     //db.end();
-//     afterConnection();
-// });
+db.connect();
 
-// function afterConnection(){
-//     db.query('SELECT * FROM products', function(err, res) {
-//         if(err) throw err;
-//         console.log(res);
-//         db.end();
-//     } )
-// }
+var displayStore = function(){
+    db.query('SELECT * FROM products', function(err, res) {
+    if (err) throw err;
+      console.log(' *** ------------------ ***');
+      console.log(' *** Welcome to Bamazon ***');
+      console.log(' *** ------------------ ***');
+      
+
+      var table = new Table({
+        head: ['Prod_ID', 'Products', 'Price', 'In_Stock_Amt']
+      , colWidths: [15, 15, 7, 14],
+      colAligns: ['center', 'left', 'center', 'center'],
+      style: {
+          head: ['aqua'],
+          compact: true
+      }
+    });
+
+
+
+    for (var i = 0; i < res.length; i++) {
+        
+        table.push([res[i].item_id, res[i].product_name, res[i].price, res[i].stock_quantity]);
+    
+    }
+    console.log(table.toString());
+    askShopInfo();
+    
+    });
+
+};
+
+displayStore();
+
+
 
 // function inquirer for prompt messages
 // The app should then prompt users with two messages.
 // The first should ask them the ID of the product they would like to buy.
 // The second message should ask how many units of the product they would like to buy.
 
+function askShopInfo() {
+    
 
     inquirer
     .prompt([
         {
             type: "input",
             name: "name",
-            message: "Which product id would you like to buy?"
-          },
-        {
-            type: "checkbox",
-            name: "name",
+            message: "Which product id would you like to buy?",
             choices: ["clothing", "kitchen", "bathroom", "outdoor"]
-    
-
           },
           {
             type: "checkbox",
             name: "products",
-            choices: ['t-shirt', 'pants', 'socks', 'fork', 'knife', 'toothbrush', 'soap', 'hose', 'shovel', 'saw']
+            choices: ["clothing", "kitchen", "bathroom", "outdoor"]
           } , 
           // choose
           {
@@ -73,7 +93,7 @@ var db = mysql.createConnection({
     ])
     .then(function(user) {
         
-        if (user.choices === 'pants') {
+        if (user.choices === 'clothing') {
           console.log("It's available ");
           
         }
@@ -81,6 +101,8 @@ var db = mysql.createConnection({
           console.log("That's okay ");
         }
       });
+
+    };
     
 
 
