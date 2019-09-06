@@ -55,14 +55,7 @@ var displayStore = function(){
 
 };
 
-displayStore();
 
-
-
-// function inquirer for prompt messages
-// The app should then prompt users with two messages.
-// The first should ask them the ID of the product they would like to buy.
-// The second message should ask how many units of the product they would like to buy.
 
 function askShopInfo() {
     
@@ -70,40 +63,55 @@ function askShopInfo() {
     inquirer
     .prompt([
         {
+            name: "itemYouWant",
             type: "input",
-            name: "name",
-            message: "Which product id would you like to buy?",
-            choices: ["clothing", "kitchen", "bathroom", "outdoor"]
-          },
-          {
-            type: "checkbox",
-            name: "products",
-            choices: ["clothing", "kitchen", "bathroom", "outdoor"]
-          } , 
-          // choose
-          {
-              type: "checkbox",
-              name: "products",
-              message: "How many units would you like to buy?",
-              choices: [1, 2, 5, 10, 50]
-
-
-          }
-
+            message: "Which product id would you like to buy?"
+            
+          } 
     ])
-    .then(function(user) {
-        
-        if (user.choices === 'clothing') {
-          console.log("It's available ");
-          
-        }
-        else {
-          console.log("That's okay ");
-        }
-      });
 
-    };
-    
+    .then(function(theItemYouPick) {
+        
+        var yourChoice = theItemYouPick.itemYouWant;
+
+        db.query("SELECT * FROM products WHERE item_id=?", yourChoice, function(err, res){
+            if (err) throw err;
+            
+            if(res.length === 0) {
+                console.log('Item does not exist, Please enter a correct id from list');
+            
+            askShopInfo();
+            
+        } else {
+            inquirer .prompt({
+                name: "quantity",
+                type: "input",
+                message: "How many items would you like to buy?"
+            })
+            .then(function(theItemYouPickQuantity) {
+                var numOfItems = theItemYouPickQuantity.quantity;
+                if (numOfItems > res[0].stock_quantity) {
+                    console.log("Sorry we only have " + res[0].stock_quantity + " items of this selected product");
+
+                   
+                }
+                askShopInfo();
+                
+            })
+        }
+        
+        
+
+
+       });
+
+    });
+
+
+};
+
+displayStore();
+
 
 
 
