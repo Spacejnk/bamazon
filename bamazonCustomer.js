@@ -1,14 +1,7 @@
 // set var for dependencies
-//var express = require('express');
 var mysql = require('mysql');
 var inquirer = require('inquirer');
 var Table = require('cli-table2');
-
-//var app = express();
-
-// app.listen('3306', () => {
-//     console.log('Server started on port 3306')
-// })
 
 // create mysql database connection
 var db = mysql.createConnection({
@@ -42,7 +35,6 @@ var displayStore = function(){
     });
 
 
-
     for (var i = 0; i < res.length; i++) {
         
         table.push([res[i].item_id, res[i].product_name, res[i].price, res[i].stock_quantity]);
@@ -54,7 +46,6 @@ var displayStore = function(){
     });
 
 };
-
 
 
 function askShopInfo() {
@@ -93,20 +84,36 @@ function askShopInfo() {
                 if (numOfItems > res[0].stock_quantity) {
                     console.log("Sorry we only have " + res[0].stock_quantity + " items of this selected product");
 
-                   
-                }
-                askShopInfo();
+                    askShopInfo();
+                } else {
+                    console.log("--------------");
+                    console.log(res[0].product_name + " purchased");
+                    console.log(numOfItems + " qty @ $" + res[0].price);
+                    console.log("--------------");
+                    console.log("Total Cost is  " + numOfItems * res[0].price.toFixed(2));
+                    var newQuantity = res[0].stock_quantity - numOfItems;
+
+                    db.query(
+                        "UPDATE products SET stock_quantity = " +
+                        newQuantity + " WHERE item_id = " + res[0].item_id,
+
+                        function(err, resUpdate){
+                            if (err) throw err;
+                            console.log("-----");
+                            console.log("Your order went through.");
+                            console.log("Thank you.");
+                            db.end();
+                        }
+                    );
+                } 
+                
                 
             })
         }
         
-        
-
-
-       });
+        });
 
     });
-
 
 };
 
