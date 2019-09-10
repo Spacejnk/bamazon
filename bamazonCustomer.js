@@ -90,16 +90,17 @@ function askShopInfo() {
                     console.log(res[0].product_name + " purchased");
                     console.log(numOfItems + " qty @ $" + res[0].price);
                     console.log("--------------");
-                    console.log("Total Cost is  " + numOfItems * res[0].price.toFixed(2));
+                    console.log("Total Cost is " + numOfItems * res[0]
+                    .price.toFixed(3));
                     var newQuantity = res[0].stock_quantity - numOfItems;
 
                     db.query(
                         "UPDATE products SET stock_quantity = " +
                         newQuantity + " WHERE item_id = " + res[0].item_id,
 
-                        function(err, resUpdate){
+                        function(err){
                             if (err) throw err;
-                            console.log("-----");
+                            console.log("--------------");
                             console.log("Your order went through.");
                             console.log("Thank you.");
                             db.end();
